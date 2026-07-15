@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jaskaran-singh.netlify.app/sitemap.xml
+Sitemap: https://newgmail2002-wq.github.io/my-web/sitemap.xml

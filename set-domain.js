@@ -28,9 +28,13 @@ if (!next) {
 }
 next = next.trim().replace(/\/+$/, ""); // drop trailing slash
 
-if (!/^https?:\/\/[^\s/]+\.[^\s/]+$/.test(next)) {
+// Allows an optional sub-path, e.g. GitHub Pages project sites:
+//   https://user.github.io/repo
+if (!/^https?:\/\/[^\s/]+\.[^\s/]+(\/[^\s]*)?$/.test(next)) {
   console.error(`Not a valid site URL: "${next}"`);
-  console.error('Expected something like https://jaskaran-singh.netlify.app');
+  console.error("Expected something like:");
+  console.error("  https://jaskaran-singh.netlify.app");
+  console.error("  https://newgmail2002-wq.github.io/my-web");
   process.exit(1);
 }
 if (next.startsWith("http://")) {
@@ -43,7 +47,8 @@ if (!fs.existsSync(robotsPath)) {
   console.error("robots.txt not found — run this from the site folder.");
   process.exit(1);
 }
-const m = fs.readFileSync(robotsPath, "utf8").match(/Sitemap:\s*(https?:\/\/[^\s/]+)/i);
+// Capture everything before /sitemap.xml so sub-paths survive a re-run
+const m = fs.readFileSync(robotsPath, "utf8").match(/Sitemap:\s*(\S+)\/sitemap\.xml/i);
 if (!m) {
   console.error("Couldn't read the current URL from robots.txt (no Sitemap: line).");
   process.exit(1);

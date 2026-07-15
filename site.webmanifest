@@ -2,13 +2,14 @@
   "name": "Jaskaran Singh — AI Expert & Website Designer",
   "short_name": "Jaskaran Singh",
   "description": "Websites that rank, ads that stop the scroll, and AI agents that never sleep.",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#05060b",
   "theme_color": "#05060b",
   "icons": [
     {
-      "src": "/assets/img/favicon.svg",
+      "src": "./assets/img/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
