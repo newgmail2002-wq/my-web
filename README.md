@@ -32,21 +32,44 @@ node set-domain.js https://your-actual-name.netlify.app
 
 > **Why this matters:** canonical tags tell Google which URL is the real one. If they point at an address you don't own, you're telling Google *"the real page is somewhere else"* — and your live site may never get indexed. Same tags drive your WhatsApp and Instagram link previews.
 
-### Step 3 — Connect the form (or you lose every lead)
+### Step 3 — The contact form goes to WhatsApp (already working)
 
-The form validates beautifully but **sends nothing** until you do this:
+When someone submits the form, it opens WhatsApp with the enquiry pre-written and addressed to **+91 95013 47341**, formatted like this:
+
+```
+New enquiry from your website
+
+Name: Priya Sharma
+Email: priya@glowskin.in
+Brand: GlowSkin
+Country: India
+Service: AI Calling Agent
+
+What they're trying to achieve:
+We miss 20+ calls a day at the clinic...
+```
+
+To change the number, edit `assets/js/main.js`:
+
+```js
+const WHATSAPP_NUMBER = "919501347341";  // country code + number, digits only
+```
+
+**⚠️ Read this — the one weakness of WhatsApp-only:** the message is composed in *your customer's* WhatsApp. **If they don't press Send, you get nothing** — and you'll never know they were there. People do get distracted at exactly that moment.
+
+**Fix it with a free email backup.** Add a Formspree ID and every enquiry is *also* emailed to you the instant they submit, whether or not they press Send:
 
 1. Sign up free at **[formspree.io](https://formspree.io)**
-2. Create a form → you get an endpoint like `https://formspree.io/f/xayzbwqd`
-3. Open `assets/js/main.js`, **line 12**, paste **just the last part**:
+2. Create a form → you get `https://formspree.io/f/xayzbwqd`
+3. Paste just the last part into `assets/js/main.js`:
 
 ```js
 const FORMSPREE_ID = "xayzbwqd";   // <- your real ID
 ```
 
-4. Re-upload the folder.
+Leave it as-is and the form is WhatsApp-only, which works fine — you just carry that risk. Free tier is 50 submissions/month.
 
-Until then, anyone who submits gets an honest "DM me on Instagram instead" message — so you don't silently lose them. Free tier is 50 submissions/month.
+**Also worth knowing:** your number is now public on the site, so expect some spam. That's the trade for the lowest-friction contact method there is. If it becomes a problem, tell me and I'll put it behind a click instead.
 
 ### Step 4 — Get indexed by Google
 

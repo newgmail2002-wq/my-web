@@ -2,12 +2,20 @@
    Jaskaran Singh — site engine
    Vanilla JS, no dependencies.
 
-   >>> SETUP: replace FORMSPREE_ID below with your real Formspree form ID.
+   --------------------------------------------------------------------------
+   WHATSAPP (primary): the contact form hands off to WhatsApp with the
+   enquiry pre-written. Country code + number, digits only — no +, no spaces.
+   91 = India.
+   --------------------------------------------------------------------------
+   FORMSPREE (optional backup): leave as-is and the form is WhatsApp-only.
+   If you add an ID, you ALSO get an email copy of every enquiry — worth doing,
+   because WhatsApp only delivers if the customer actually presses Send.
        1. Sign up free at https://formspree.io
-       2. Create a form -> it gives you an endpoint like https://formspree.io/f/xyzabcd
+       2. Create a form -> you get https://formspree.io/f/xyzabcd
        3. Paste just the last part (xyzabcd) below.
    ========================================================================== */
 
+const WHATSAPP_NUMBER = "919501347341";
 const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
 
 (() => {
@@ -465,7 +473,20 @@ const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
       status.textContent = msg;
     };
 
-    form.addEventListener("submit", async (e) => {
+    /* Compose the WhatsApp message from the form fields */
+    const buildMessage = () => {
+      const v = (id) => ($(`#${id}`, form)?.value || "").trim();
+      const sel = $("#service", form);
+      const serviceLabel = sel.selectedOptions[0]?.text || sel.value;
+
+      const lines = ["New enquiry from your website", "", `Name: ${v("name")}`, `Email: ${v("email")}`];
+      if (v("brand")) lines.push(`Brand: ${v("brand")}`);
+      if (v("country")) lines.push(`Country: ${v("country")}`);
+      lines.push(`Service: ${serviceLabel}`, "", "What they're trying to achieve:", v("message"));
+      return lines.join("\n");
+    };
+
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
 
       // Honeypot: only bots fill this
@@ -478,38 +499,27 @@ const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
         return;
       }
 
-      if (FORMSPREE_ID === "YOUR_FORMSPREE_ID") {
-        show(
-          "err",
-          "The form isn't connected yet. Add your Formspree ID in assets/js/main.js (see README), or reach me on Instagram in the meantime."
-        );
-        return;
-      }
+      // Open WhatsApp synchronously, still inside the click gesture — any `await`
+      // before this point would let the popup blocker swallow it.
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`;
+      const win = window.open(waUrl, "_blank", "noopener");
+      if (!win) location.href = waUrl; // popup blocked — go there directly instead
 
-      submit.classList.add("is-loading");
-      submit.disabled = true;
-      if (status) status.className = "form-status";
+      show(
+        "ok",
+        "WhatsApp is opening with your message ready — press Send there and it reaches me straight away. I reply to every enquiry personally."
+      );
 
-      try {
-        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      // Optional email backup. WhatsApp only delivers if the customer presses
+      // Send; this makes sure the lead still reaches you if they don't.
+      if (FORMSPREE_ID !== "YOUR_FORMSPREE_ID") {
+        fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
           method: "POST",
           body: new FormData(form),
           headers: { Accept: "application/json" },
+        }).catch(() => {
+          /* WhatsApp is already open — never block the lead on this */
         });
-
-        if (res.ok) {
-          form.reset();
-          show("ok", "Thanks — your message is in. I reply to every enquiry personally, usually within 24 hours.");
-        } else {
-          const data = await res.json().catch(() => ({}));
-          const detail = data.errors?.map((x) => x.message).join(", ");
-          show("err", detail || "Something went wrong sending that. Please DM me on Instagram instead.");
-        }
-      } catch {
-        show("err", "Network error — check your connection, or DM me on Instagram and I'll pick it up there.");
-      } finally {
-        submit.classList.remove("is-loading");
-        submit.disabled = false;
       }
     });
 
