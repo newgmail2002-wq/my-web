@@ -1,0 +1,21 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Deploy tooling
+.netlify/
+.vercel/
+
+# Node (not used by the site itself, but keeps stray installs out)
+node_modules/
+npm-debug.log*
+
+# Local env / secrets — never commit these
+.env
+.env.*
